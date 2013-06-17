@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#F1F2F2">
+    
+ 	<ImageView
+       android:id="@+id/nav_bg"
+       android:layout_marginTop="0dip"
+       android:layout_width="fill_parent"
+       android:layout_height="wrap_content"
+       android:src="@drawable/navi_background2"/>
+ 	
+	<TextView
+       android:layout_gravity="top|center"
+       android:layout_marginTop="5dip"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text="测试数据测试数据" 
+       android:textSize="24dp"
+       android:textColor="#ffffff"
+       android:textStyle="bold"/>
+    
+	<ImageView
+       android:id="@+id/nav_back"
+       android:layout_gravity="top|left"
+       android:layout_marginTop="0dip"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:src="@drawable/backitem2"
+       android:clickable="true"
+       android:onClick="onBackMainClicked"/>
+	
+    <ImageView
+       android:id="@+id/list_model"
+       android:layout_gravity="top|right"
+       android:layout_marginTop="5dip"
+       android:layout_marginRight="5dip"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:src="@drawable/listitem2"
+       android:clickable="true"
+       android:onClick="onListItemClicked"/>
+    
+    <RelativeLayout 
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+	   android:layout_marginTop="46dip">
+	   
+      <RelativeLayout 
+       android:id="@+id/show_model"
+       android:layout_width="wrap_content"
+       android:layout_height="280dip"
+       android:layout_centerHorizontal="true">
+	   
+       </RelativeLayout>
+      
+	     <LinearLayout 
+	       android:id="@+id/show_progress"
+	       android:orientation="vertical"
+	       android:layout_width="wrap_content"
+	       android:layout_height="wrap_content"
+	       android:layout_below="@id/show_model">
+	         <SeekBar
+	             android:id="@+id/play_seek"
+	             android:layout_width="300dip"
+	             android:layout_height="wrap_content"
+	             android:maxHeight="5px"
+	             android:minHeight="5px"
+	             android:paddingLeft="20px"
+	             android:paddingRight="5px"
+	             android:progressDrawable="@drawable/seekbar_progress"
+	             android:scrollbarStyle="outsideOverlay"
+	             android:thumb="@drawable/thumb"
+	             android:thumbOffset="1px"/>
+	         
+	         <LinearLayout 
+	            android:orientation="horizontal"
+	            android:layout_width="wrap_content"
+		        android:layout_height="wrap_content">
+		        <!-- 播放时间  总时间  测试数据 -->
+	             <TextView
+			        android:id="@+id/play_time"   
+			        android:paddingLeft="20dip" 
+			        android:paddingRight="210dip"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:text="05:24"
+			        android:textColor="#000000"
+			        android:textSize="12dp"/>
+	            <TextView
+			        android:id="@+id/total_time"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:text="10:16"
+			        android:textColor="#000000"
+			        android:textSize="12dp"/>
+	         </LinearLayout>
+	   </LinearLayout>
+	   
+	     	<LinearLayout 
+	     	    android:layout_below="@id/show_progress"
+	     	    android:layout_marginTop="10dip"
+	            android:orientation="horizontal"
+	            android:layout_width="fill_parent"
+		        android:layout_height="wrap_content">
+	             <ImageView
+			       android:id="@+id/play_pre"
+			       android:src="@drawable/pre2"
+			       android:layout_weight="1"
+			       android:layout_width="84dip"
+			       android:layout_height="84dip"/>
+	              	    
+	             <ImageView
+			       android:id="@+id/play"
+			       android:src="@drawable/play2"
+			       android:layout_weight="1"
+			       android:layout_width="114dip"
+			       android:layout_height="114dip"/>
+	              	    	    
+	             <ImageView
+			       android:id="@+id/play_next"
+			       android:src="@drawable/next2"
+			       android:layout_weight="1"
+			       android:layout_width="84dip"
+			       android:layout_height="84dip"/>
+	       </LinearLayout>
+    </RelativeLayout>
+    
+</FrameLayout>

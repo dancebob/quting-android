@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">趣听</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+    
+    <string name="navititle">趣  听</string>
+    <string name="help">帮   助</string>
+    <string name="about">关   于</string>
+    <string name="set">设   置</string>
+    <string name="check">检查更新</string>
+
+</resources>

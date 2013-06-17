@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+      
+    <layer-list xmlns:android="http://schemas.android.com/apk/res/android">  
+      
+         <!-- 进度条未走过的颜色 -->
+         <item android:id="@android:id/background" android:drawable="@drawable/slider_max"/>  
+     <!--<item android:id="@android:id/secondaryProgress" android:drawable="@drawable/jindutiao"/> --> 
+         
+         <item android:id="@android:id/progress" android:drawable="@drawable/slider_min"/>  <!-- 进度条走过去的颜色 -->
+      
+     </layer-list> 

@@ -1,0 +1,122 @@
+package com.example.quting.entity.media;
+
+import java.io.Serializable;
+
+public class MediaBaseEntity  implements Serializable{
+	
+	/**
+	 * {"author":"鸿达以太","category":"少儿读物","created_at":"2013-06-14T09:57
+	 * :31Z","description":"作品简介： 这个故事带出的启示就是：骄傲是没有好下场的，有些人虽击败过比
+	 * 自己强大的人，也会被比自己弱小的人击败。","id":3,"is_like":0,"jishu":"总集数：1",
+	 * "mtype":"http://www.huaxiazi.com/ProductImages/20091211110917.jpg",
+	 * "name":"蚊子和狮子","time":null,"updated_at":"2013-06-14T09:57:31Z",
+	 * "updatetime":"2009-12-11","url":"http://www.huaxiazi.com/Productinfo
+	 * .aspx?id=5178","yanbo":"鸿达以太"}
+	 * 
+	 * 
+	 * */
+	
+	private static final long serialVersionUID = 1L;
+	
+	private String author;
+	private String category;
+	private String created_at;
+	private String description;
+	private String id;
+	private String is_like;
+	private String jishu;
+	private String mtype;
+	private String name;
+	private String time;
+	private String updated_at;
+	private String updatetime;
+	private String url;
+	private String yanbo;
+	
+	public String getAuthor() {
+		return author;
+	}
+	public void setAuthor(String author) {
+		this.author = author;
+	}
+	public String getCategory() {
+		return category;
+	}
+	public void setCategory(String category) {
+		this.category = category;
+	}
+	public String getCreated_at() {
+		return created_at;
+	}
+	public void setCreated_at(String created_at) {
+		this.created_at = created_at;
+	}
+	public String getDescription() {
+		return description;
+	}
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
+	public String getIs_like() {
+		return is_like;
+	}
+	public void setIs_like(String is_like) {
+		this.is_like = is_like;
+	}
+	public String getJishu() {
+		return jishu;
+	}
+	public void setJishu(String jishu) {
+		this.jishu = jishu;
+	}
+	public String getMtype() {
+		return mtype;
+	}
+	public void setMtype(String mtype) {
+		this.mtype = mtype;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getTime() {
+		return time;
+	}
+	public void setTime(String time) {
+		this.time = time;
+	}
+	public String getUpdated_at() {
+		return updated_at;
+	}
+	public void setUpdated_at(String updated_at) {
+		this.updated_at = updated_at;
+	}
+	public String getUpdatetime() {
+		return updatetime;
+	}
+	public void setUpdatetime(String updatetime) {
+		this.updatetime = updatetime;
+	}
+	public String getUrl() {
+		return url;
+	}
+	public void setUrl(String url) {
+		this.url = url;
+	}
+	public String getYanbo() {
+		return yanbo;
+	}
+	public void setYanbo(String yanbo) {
+		this.yanbo = yanbo;
+	}
+	
+	
+}

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content">
+    
+ <!-- 从网络获取播放的图片 -->
+	    <ImageView
+	       android:id="@+id/mp3_icon"
+	       android:layout_centerHorizontal="true"
+	       android:layout_width="wrap_content"
+	       android:layout_height="wrap_content"
+	       android:src="@drawable/playtest"
+	       android:clickable="true"
+	       android:onClick="onListItemClicked"/>
+         <!-- fav_icon收藏的标志 -->
+	    <ImageView
+	       android:id="@+id/fav_icon"
+	       android:layout_width="wrap_content"
+	       android:layout_height="wrap_content"/>
+	     <!-- 类别 段子 -->
+	    <LinearLayout 
+	       android:id="@+id/show_text"
+	       android:orientation="vertical"
+	       android:layout_width="wrap_content"
+	       android:layout_height="wrap_content"
+	       android:layout_below="@id/mp3_icon">
+		    <TextView
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:text="类别"
+		        android:textColor="#000000"
+		        android:textSize="18dp"
+		        android:textStyle="bold"/>
+		    <TextView
+		        android:id="@+id/duanzi"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:text="段子"
+		        android:textColor="#000000"
+		        android:textSize="12dp"/>
+	    </LinearLayout>
+    
+</RelativeLayout>
