@@ -1,0 +1,38 @@
+/**
+ * 
+ */
+package com.example.quting.utils;
+
+import java.io.File;
+
+import com.example.quting.database.DatabaseHelper;
+import com.example.quting.entity.ViewHolder;
+
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Environment;
+public class SDCardUtil {
+	// 判断sdcard是否插入
+	public static boolean checkStorageState() {
+		String status = Environment.getExternalStorageState();
+		if (status.equals(Environment.MEDIA_MOUNTED)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public static String defaultPath(){
+		///data/data/<package_name>/databases
+		System.out.println(Environment.getExternalStorageDirectory());
+		if(checkStorageState()){
+			String str = "/mnt/data/data/com.example.quting/databases/"+ViewHolder.DATABASE;
+			File file = new File("/mnt/data/data/com.example.quting/databases/"+ViewHolder.DATABASE);
+			if(!file.exists()){
+				/*DatabaseHelper dbHelper = new DatabaseHelper(getContext(), ViewHolder.DATABASE);
+				SQLiteDatabase db = dbHelper.getWritableDatabase();*/
+			}
+			return	str;
+		}
+		return null;
+	}
+}

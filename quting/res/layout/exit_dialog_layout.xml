@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+   xmlns:android="http://schemas.android.com/apk/res/android"    
+   android:layout_width="wrap_content"   
+   android:layout_height="wrap_content"    
+   android:background="@drawable/exit_dialog"
+   android:gravity="center_vertical|center_horizontal">   
+   
+    
+    <LinearLayout 
+       android:layout_width="wrap_content"   
+       android:layout_height="wrap_content"
+       android:layout_gravity="top|center">
+          <TextView        
+             android:layout_height="wrap_content"    
+             android:layout_width="wrap_content"
+             android:layout_gravity="center|top"
+             android:text="您确定退出程序吗?"      
+             android:textStyle="bold"
+             android:textColor="#ffffff"       
+             android:textSize="35px"
+             android:layout_marginTop="10dip"/>   
+    </LinearLayout>
+     
+<!-- 	   <RelativeLayout         
+	      android:layout_width="fill_parent"     
+	      android:layout_height="wrap_content"    
+	      android:gravity="left"
+	      android:paddingLeft="30dip">
+	      
+	      <TextView android:text="提示" 
+	        android:textColor="#ffffff" 
+	        android:layout_gravity="left"
+	        android:layout_width="wrap_content" 
+	        android:layout_height="wrap_content" 
+	        android:textSize="40px"/>       
+	     </RelativeLayout>     -->
+     
+     
+	<!--       <LinearLayout 
+	           android:layout_width="wrap_content"     
+	           android:layout_height="wrap_content"
+	           android:layout_gravity="bottom|center"    
+	           android:layout_marginBottom="30dip"
+	           android:orientation="horizontal"> 
+	           
+     	      <Button           
+	             android:id="@+id/dialog_button_ok"    
+	             android:clickable="true"
+	             android:background="@drawable/dialog_button_selector"
+	             android:layout_width="wrap_content"          
+	             android:layout_height="wrap_content"    
+	             android:textSize="30px"       
+	             android:textColor="#ffffff"    
+	             android:text="确定"/>  
+	             
+     	      <Button
+		         android:id="@+id/dialog_button_cancel"
+		         android:layout_width="wrap_content"
+		         android:layout_height="wrap_content"
+		         android:clickable="true"
+		         android:background="@drawable/dialog_button_selector"
+		         android:text="取消"
+		         android:textColor="#ffffff"
+		         android:textSize="30px"/>
+	      </LinearLayout> -->
+	      
+	    <RelativeLayout 
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="bottom|center"    
+	        android:layout_marginBottom="30dip">
+	        <Button 
+	            android:id="@+id/dialog_button_ok"
+	            android:background="@drawable/dialog_button_selector"
+	            android:layout_alignParentLeft="true"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="确定"
+	            android:textColor="#ffffff"/>
+	        <Button 
+	            android:id="@+id/dialog_button_cancel"
+	            android:background="@drawable/dialog_button_selector"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_toRightOf="@id/dialog_button_ok"
+	            android:layout_marginLeft="30dip"
+	            android:text="取消"
+	            android:textColor="#ffffff"/>
+        </RelativeLayout>
+
+</FrameLayout>
+
+
+                      

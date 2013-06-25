@@ -1,0 +1,42 @@
+package com.example.quting.database;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+
+import com.example.quting.entity.ViewHolder;
+
+public class DataBaseOperate {
+	
+	public static void Delete(Context context,String DBTableName,String whereClause,String[] whereArgs){
+		DatabaseHelper dbHelper = new DatabaseHelper(context, ViewHolder.DATABASE);
+		SQLiteDatabase db = dbHelper.getWritableDatabase();
+		db.delete(DBTableName, whereClause, whereArgs);
+		db.close();
+	}
+	public static void Update(Context context,String DBTableName,ContentValues values,String whereClause,String[] whereArgs){
+		DatabaseHelper dbHelper = new DatabaseHelper(context, ViewHolder.DATABASE);
+		SQLiteDatabase db = dbHelper.getWritableDatabase();
+		db.update(DBTableName, values, whereClause, whereArgs);
+		db.close();
+	}
+	public static void Insert(Context context,String DBTableName,ContentValues values){
+		DatabaseHelper dbHelper = new DatabaseHelper(context, ViewHolder.DATABASE);
+		SQLiteDatabase db = dbHelper.getWritableDatabase();
+		db.insert(DBTableName, null, values);
+		db.close();
+	}
+	public static String SelectOne(Context context,String DBTableName,String columnName,String selection,String[] selectionArgs){
+		String value = new String();
+		DatabaseHelper dbHelper = new DatabaseHelper(context, ViewHolder.DATABASE);
+		SQLiteDatabase db = dbHelper.getReadableDatabase();
+		Cursor cursor = db.query(DBTableName, new String[]{columnName}, selection, selectionArgs, null, null, null);
+		while(cursor.moveToNext()){
+			value = cursor.getString(cursor.getColumnIndex(columnName));
+		}
+		cursor.close();
+		db.close();
+		return value;
+	}
+}

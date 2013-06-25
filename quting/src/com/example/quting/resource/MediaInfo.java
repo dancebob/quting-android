@@ -1,0 +1,180 @@
+package com.example.quting.resource;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.provider.MediaStore.Audio.Media;
+import android.util.Log;
+
+import com.example.quting.entity.media.MediaBaseEntity;
+import com.example.quting.entity.media.MediaEntity;
+import com.example.quting.media.FileUtils;
+import com.example.quting.utils.BitmapTool;
+import com.example.quting.utils.http.MD5;
+
+public class MediaInfo{
+	
+	public List<MediaBaseEntity> temp_list = new ArrayList<MediaBaseEntity>();
+	private static MediaInfo instance;
+	private static Object lock_object = new Object();
+	public static MediaInfo getInstance(){
+		if(instance == null){
+			synchronized (lock_object) {
+				instance = new MediaInfo();
+			}
+		}
+		return instance;
+	}
+	
+	private MediaInfo(){
+		
+	}
+	/**
+	 * 获取mediaList
+	 * */
+	public MediaEntity findMediaListFromNet(String myurl) throws Throwable{
+		List<MediaBaseEntity> list = new ArrayList<MediaBaseEntity>();
+		String JsonString = null;
+		JSONObject title = null;
+		URL url = new URL(myurl);
+		HttpURLConnection urlConn = (HttpURLConnection) url.openConnection();
+		InputStreamReader in = new InputStreamReader(urlConn.getInputStream());
+		BufferedReader buffer = new BufferedReader(in);
+		JsonString = buffer.readLine();
+		urlConn.disconnect();
+		
+		title = new JSONObject(JsonString);
+		
+		MediaEntity media_entity = new MediaEntity();
+		media_entity.setCount(title.getInt("count"));
+		JSONArray jsonArray = title.getJSONArray("media");
+		if(jsonArray != null && jsonArray.length()>0){
+			for(int i=0;i<jsonArray.length();i++){
+				MediaBaseEntity entity = new MediaBaseEntity();
+				JSONObject jsonValue = jsonArray.getJSONObject(i);
+				entity.setAuthor(jsonValue.getString("author"));
+				entity.setCategory(jsonValue.getString("category"));
+				entity.setCreated_at(jsonValue.getString("created_at"));
+				entity.setDescription(jsonValue.getString("description"));
+				entity.setId(jsonValue.getString("id"));
+				entity.setIs_like(jsonValue.getString("is_like"));
+				entity.setJishu(jsonValue.getString("jishu"));
+				entity.setMtype(jsonValue.getString("mtype"));
+				entity.setName(jsonValue.getString("name"));
+				entity.setTime(jsonValue.getString("time"));
+				entity.setUpdated_at(jsonValue.getString("updated_at"));
+				entity.setUpdatetime(jsonValue.getString("updatetime"));
+				entity.setUrl(jsonValue.getString("url"));
+				if(!list.contains(entity)){
+					list.add(entity);
+				}
+			}
+		}
+		setTemp_list(list);
+		media_entity.setMedia(list);
+		return media_entity;
+	}
+	public List<MediaBaseEntity> getTemp_list() {
+		return temp_list;
+	}
+	public void setTemp_list(List<MediaBaseEntity> temp_list) {
+		this.temp_list = temp_list;
+	}
+	public List<MediaBaseEntity> swichMediaBaseEntity(int flag){
+		List<MediaBaseEntity> shaoer_list = new ArrayList<MediaBaseEntity>();
+		List<MediaBaseEntity> wenshi_list = new ArrayList<MediaBaseEntity>();
+		List<MediaBaseEntity> youmo_list = new ArrayList<MediaBaseEntity>();
+		List<MediaBaseEntity> jiankang_list = new ArrayList<MediaBaseEntity>();
+		List<MediaBaseEntity> jiaoyu_list = new ArrayList<MediaBaseEntity>();
+		List<MediaBaseEntity> yule_list = new ArrayList<MediaBaseEntity>();
+		List<MediaBaseEntity> list = getTemp_list();
+		if(list != null && list.size()>0){
+			for(int i =0;i<list.size();i++){
+				MediaBaseEntity entity = list.get(i);
+				String temp=  entity.getCategory();
+				if("少儿读物".equals(temp) && !shaoer_list.contains(entity)){
+					shaoer_list.add(entity);
+				}else if("文史经典".equals(temp) && !wenshi_list.contains(entity)){
+					wenshi_list.add(entity);
+				}else if("幽默搞笑".equals(temp) && !youmo_list.contains(entity)){
+					youmo_list.add(entity);
+				}else if("健康养生".equals(temp) && !jiankang_list.contains(entity)){
+					jiankang_list.add(entity);
+				}else if("教育管理".equals(temp) && !jiaoyu_list.contains(entity)){
+					jiaoyu_list.add(entity);
+				}else if("综艺娱乐".equals(temp) && !yule_list.contains(entity)){
+					yule_list.add(entity);
+				}
+			}
+		}
+		switch (flag) {
+			case 0:
+				return shaoer_list;
+			case 1:
+				return wenshi_list;
+			case 2:
+				return youmo_list;
+			case 3:
+				return jiankang_list;
+			case 4:
+				return jiaoyu_list;
+			case 5:
+				return yule_list;
+		}
+		return null;
+	}
+	
+	/*
+     * 从网络上获取图片，如果图片在本地存在的话就直接拿，如果不存在再去服务器上下载图片
+     * 这里的path是图片的地址
+     */
+    public Bitmap getImageURI(String path, File cache) throws Exception {
+        String name = MD5.getMD5(path) + path.substring(path.lastIndexOf("."));
+        File file = new File(cache, name);
+        // 如果图片存在本地缓存目录，则不去服务器下载
+        	if (file.exists()) {
+                return BitmapTool.toRoundBitmap(BitmapTool.zoomBitmap(BitmapFactory.decodeFile(file.getPath()),190,190));  // 从sdcard返回 圆形
+            }else {
+                // 从网络上获取图片
+                URL url = new URL(path);
+                HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+                conn.setConnectTimeout(5000);
+                conn.setRequestMethod("GET");
+                conn.setDoInput(true);
+            	if (FileUtils.getSDPath() ==null) {  //如果sdcard不存在直接从网上
+            		InputStream is = conn.getInputStream();
+            		Bitmap bitmap = BitmapTool.zoomBitmap(BitmapFactory.decodeStream(is),190,190);
+            		return BitmapTool.toRoundBitmap(bitmap);
+            	}else {
+            		 if (conn.getResponseCode() == 200) {
+                         InputStream is = conn.getInputStream();
+                         FileOutputStream fos = new FileOutputStream(file);
+                         byte[] buffer = new byte[1024];
+                         int len = 0;
+                         while ((len = is.read(buffer)) != -1) {
+                             fos.write(buffer, 0, len);
+                         }
+                         is.close();
+                         fos.close();
+                         Bitmap bitmap = BitmapTool.zoomBitmap(BitmapFactory.decodeFile(file.getPath()),190,190);
+                         return BitmapTool.toRoundBitmap(bitmap);
+                     }
+				}
+            }
+        return null;
+    }
+
+}

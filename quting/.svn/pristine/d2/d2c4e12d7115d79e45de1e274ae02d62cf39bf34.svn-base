@@ -1,0 +1,73 @@
+package com.example.quting.test;
+
+import java.lang.ref.SoftReference;
+
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.os.Message;
+import android.test.AndroidTestCase;
+
+import com.example.quting.entity.media.MediaEntity;
+import com.example.quting.entity.mp3.Mp3Entity;
+import com.example.quting.image.ApacheUtility;
+import com.example.quting.resource.MediaInfo;
+import com.example.quting.resource.Mp3Info;
+
+public class Test extends AndroidTestCase {
+	/**
+	 * 获取mediaList
+	 * */
+	public void testLoadMediaList() throws Throwable{
+		try{
+			String myurl = "http://t.pamakids.com/api/media?page=1";
+			MediaEntity entity = MediaInfo.getInstance().findMediaListFromNet(myurl);
+			// 返回一个list集合 System.out.println(entity.getMedia());
+		}catch(Exception e){
+			e.toString();
+		}
+	}
+	/**
+	 * 异步加载图片
+	 * */
+	public void testLoadMediaImage() throws Throwable{
+		try{
+			final String myurl = "http://www.huaxiazi.com/ProductImages/20091211110917.jpg";
+			  new Thread(){
+				  	@Override
+				    public void run(){
+				      Bitmap drawable=ApacheUtility.GetBitmapByUrl(myurl); // 调用前面 ApacheUtility 类的方法
+				      System.out.println("AAAA "+drawable);
+				    }
+				  }.start();
+				   
+		}catch(Exception e){
+			e.toString();
+		}
+	}
+	
+	/**
+	 * 获取mp3info list
+	 * */
+	public void testLoadMp3InfoList() throws Throwable{
+		try{
+			String myurl ="http://t.pamakids.com/api/mfiles?medium_id=5";
+			Mp3Entity entity = Mp3Info.getInstance().findMp3ListFromNet(myurl);
+			System.out.println("mp3info  "+entity.getMfiles().size());
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	/**
+	 * 获取分类列表
+	 * */
+	public void testLoadMediaCategray() throws Throwable{
+		String myurl = "http://t.pamakids.com/api/media?page=1";
+		MediaInfo.getInstance().findMediaListFromNet(myurl);
+		System.out.println("categray size "+MediaInfo.getInstance().swichMediaBaseEntity(0).size());
+		System.out.println("categray size "+MediaInfo.getInstance().swichMediaBaseEntity(1).size());
+		System.out.println("categray size "+MediaInfo.getInstance().swichMediaBaseEntity(2).size());
+		System.out.println("categray size "+MediaInfo.getInstance().swichMediaBaseEntity(3).size());
+		System.out.println("categray size "+MediaInfo.getInstance().swichMediaBaseEntity(4).size());
+		System.out.println("categray size "+MediaInfo.getInstance().swichMediaBaseEntity(5).size());
+	}
+}

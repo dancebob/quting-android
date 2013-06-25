@@ -1,0 +1,137 @@
+package com.example.quting.media;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.net.URL;
+
+import android.content.Context;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.util.Log;
+
+import com.example.quting.entity.ViewHolder;
+import com.example.quting.entity.mp3.Mp3BaseEntity;
+
+
+public class MyMp3Player {
+	private MediaPlayer player;
+
+	private Context context;
+
+	private Mp3BaseEntity song;
+	
+	public MyMp3Player(Context context){
+		super();
+		this.context = context;
+	}
+
+	public void play(Mp3BaseEntity song) {
+		this.song = song;
+		File songFile = FileUtils.getSDFile(ViewHolder.BASE_SONG_CACHE_DIR + song.getId() + ".mp3");
+		if (songFile.exists()) {
+			realPlay(songFile, 0);
+		} else {
+			new DownloadThread(song).start();
+		}
+	}
+	
+	public MediaPlayer getMediaPlayer() {
+		return player;
+	}
+	
+	private void realPlay(final File file, int position) {
+		if (player != null) {
+			//player.stop();
+			player.release();
+		}
+		player = new MediaPlayer();
+		player.setAudioStreamType(AudioManager.STREAM_MUSIC);
+		player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+			public void onCompletion(MediaPlayer mediaPlayer) {
+				int currentPosition = player.getCurrentPosition();
+				if (currentPosition < player.getDuration()) {
+					realPlay(file, currentPosition);
+				} else {
+					//换下一个
+					
+				}
+			}
+		});
+		try {
+			player.setDataSource(new FileInputStream(file).getFD());
+			player.prepare();
+			player.seekTo(position);
+			player.start();
+			//校正时间
+			int duration = player.getDuration();
+			
+		} catch (Exception e) {
+			// 换下一个
+			
+		}
+	}
+	
+	private class DownloadThread extends Thread {
+		private Mp3BaseEntity song;
+
+		public DownloadThread(Mp3BaseEntity song) {
+			this.song = song;
+		}
+
+		@Override
+		public void run() {
+			try {
+				if (player != null) {
+					player.release();
+					player = null;
+				}
+				InputStream inputStream = new URL(song.getUrl()).openStream();
+				File cacheFile = new File(context.getCacheDir(), song.getId() + ".dat");
+				FileOutputStream outputStream = new FileOutputStream(cacheFile);
+
+				byte[] buffer = new byte[1024];
+				int length = -1;
+
+				// 缓存1秒钟需要的字节数
+				while ((length = inputStream.read(buffer)) != -1) {
+					outputStream.write(buffer, 0, length);
+					if (song.equals(MyMp3Player.this.song)) {
+						if (player == null) {
+							if (cacheFile.length() / 1000 > 128 / 8 * 10) {
+								realPlay(cacheFile, 0);
+							}
+						}
+					}
+				}
+				inputStream.close();
+				outputStream.close();
+				FileInputStream fis = new FileInputStream(cacheFile);
+				File songFile = FileUtils.getSDFile(ViewHolder.BASE_SONG_CACHE_DIR + song.getId() + ".mp3");
+				Log.d("AA", "Prepare save song to " + songFile.getAbsolutePath());
+				if (!songFile.exists()) {
+					songFile.getParentFile().mkdirs();
+					songFile.createNewFile();
+				}
+				FileOutputStream fos = new FileOutputStream(songFile);
+				IOUtils.copy(fis, fos);
+				fis.close();
+				fos.close();
+				Log.d("AA", "Save song to " + songFile.getAbsolutePath() + " success.");
+				if (song.equals(MyMp3Player.this.song)) {
+					Log.i("AA", "Reload " + song.getName() + " from local file.");
+					int currentPosition = player.getCurrentPosition();
+					realPlay(songFile, currentPosition);
+					//下载
+					//context.sendBroadcast(new Intent(Constants.SONG_DOWNLOADED_ACTION));
+				}
+			} catch (Exception e) {
+				if (song.equals(MyMp3Player.this.song)) {
+					// 换下一个
+				}
+				e.printStackTrace();
+			}
+		}
+	}
+}

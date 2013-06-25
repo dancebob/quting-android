@@ -1,0 +1,267 @@
+package com.example.quting;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.example.quting.database.SqlLiteUtil;
+import com.example.quting.entity.media.MediaBaseEntity;
+import com.example.quting.entity.mp3.Mp3BaseEntity;
+import com.example.quting.media.MyMediaPlayer;
+import com.example.quting.resource.Mp3Info;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
+import android.widget.TextView;
+
+public class PlayActivity extends Activity implements OnClickListener{
+	
+	 private RelativeLayout model_Layout; // 模式容器
+	 private LayoutInflater mInflater;  
+	 private View pictureModel,listModel; // 两种模式
+	 
+	 private ImageView model_btn;   // 切换模式的按钮
+	 private ListModelAdapter adapter;
+	 
+	 private boolean isListModel = false;  // 判断当前模式
+	 
+	 private QuTingApplication application; //程序全局类
+	 
+	 private int index;
+	 private MediaBaseEntity mediaBaseEntity;
+	 private ArrayList<MediaBaseEntity> mediaBaseEntityList; 
+	 private TextView titleView,totalTime;
+	 private ImageView playImg,playNextImg;
+	 
+	 // picture model 
+	 private TextView show_ca,show_duanzi; //picture_text_ca  picture_duanzi
+	 
+	 private String mp3url ="http://t.pamakids.com/api/mfiles?medium_id=";
+	 private List<Mp3BaseEntity> mp3List;
+	 private ArrayList<String> mp3Names,mp3Times;
+	 private Mp3BaseEntity mp3BaseEntity;
+	 private int mp3_index = 0;
+	 private MyMediaPlayer player;
+	 
+	 private SeekBar seekBar;
+	 
+	 private Handler handler = new Handler(){
+		 public void handleMessage(Message msg) {
+			 switch (msg.what) {
+				case 0:
+					show_duanzi.setText(mp3Names.get(mp3_index));
+					totalTime.setText(mp3Times.get(mp3_index));
+					Log.i("mp3_index", ""+mp3List.get(mp3_index).getName());
+					break;
+	
+				default:
+					break;
+			}
+		 };
+	 };
+	
+     protected void onCreate(Bundle savedInstanceState) {
+    	 super.onCreate(savedInstanceState);
+    	 
+    	 setContentView(R.layout.activity_play);
+    	 
+    	 Intent intent = getIntent();
+    	 index = intent.getIntExtra("index_id", 1);
+    	 mediaBaseEntityList = SqlLiteUtil.getDingyue(); // 从数据库中查询出 已经订阅的实体 集合 18600228300
+    	 mediaBaseEntity = mediaBaseEntityList.get(index);
+    	 
+  		 application = (QuTingApplication)getApplication();
+  		 application.addActivity(this);
+    	 
+    	 model_Layout = (RelativeLayout)findViewById(R.id.show_model);
+    	 mInflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    	 pictureModel = mInflater.inflate(R.layout.play_picture_model, null);
+    	 listModel = mInflater.inflate(R.layout.play_list_model, null);
+    	 model_Layout.addView(pictureModel);
+    	 
+    	 model_btn = (ImageView)findViewById(R.id.list_model);
+    	 
+    	 adapter = new ListModelAdapter(getApplicationContext());
+    	 
+    	try {
+    		mp3List = Mp3Info.getInstance().findMp3ListFromNet(mp3url+mediaBaseEntity.getId()).getMfiles();
+    		if (mp3List != null) {
+    			Log.i("mp3Listmp3List", ""+mp3List.get(mp3_index).getName());
+			}
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+    	
+    	initView();
+    	
+    	new Thread(){
+    		public void run() {
+    	  		List<String> listUrl = new ArrayList<String>();
+    	  		mp3Names = new ArrayList<String>();
+    	  		mp3Times = new ArrayList<String>();
+    			for(int i=0;i<mp3List.size();i++){
+    				String str = mp3List.get(i).getUrl().substring(6,mp3List.get(i).getUrl().length());
+    				listUrl.add("http://t.pamakids.com"+str);
+    				mp3Names.add(mp3List.get(i).getName());
+    				mp3Times.add(mp3List.get(i).getTime());
+    			}
+    			Log.i("listUrllistUrl", ""+listUrl.get(2));
+    	  		player = new MyMediaPlayer(listUrl);
+    		};
+    	}.start();
+     }
+     
+     public void initView(){
+    	 titleView = (TextView)findViewById(R.id.play_title);
+    	 titleView.setText(mediaBaseEntity.getName());
+    	 
+    	 show_ca = (TextView)pictureModel.findViewById(R.id.picture_text_ca);
+    	 show_ca.setText(mediaBaseEntity.getName());
+    	 
+    	 show_duanzi = (TextView)pictureModel.findViewById(R.id.picture_duanzi);
+    	 show_duanzi.setText(mp3List.get(mp3_index).getName());
+    	 
+    	 totalTime = (TextView)findViewById(R.id.total_time);
+    	 totalTime.setText(mp3List.get(mp3_index).getTime());
+    	 
+    	 playImg = (ImageView)findViewById(R.id.play);
+    	 
+    	 playNextImg = (ImageView)findViewById(R.id.play_next);
+    	 playNextImg.setOnClickListener(this);
+    	 
+    	 seekBar = (SeekBar)findViewById(R.id.play_seek);
+    	 seekBar.setOnSeekBarChangeListener(seekBarChangeListener);
+     }
+     
+     OnSeekBarChangeListener seekBarChangeListener = new OnSeekBarChangeListener(){
+         public void onProgressChanged(SeekBar seekBar, int progress,boolean fromUser) {
+             //mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0);
+        	// fromUser判断是用户改变的滑块的值  
+        	 seekBar.setProgress(progress);
+         }
+         public void onStartTrackingTouch(SeekBar seekBar) {}
+         public void onStopTrackingTouch(SeekBar seekBar) {}
+     };
+     
+     Runnable updateThread = new Runnable(){  
+         public void run() {  
+             seekBar.setProgress(player.getCurrentPosition());  
+             //每次延迟100毫秒再启动线程  
+             handler.postDelayed(updateThread, 100);  
+         }  
+     };  
+     
+     public void onBackMainClicked(View view){
+ 		Intent intent = new Intent(this,MainActivity.class);
+ 		int version = Integer.valueOf(android.os.Build.VERSION.SDK);   
+ 		startActivity(intent);
+     	if(version >= 5) {   
+     		overridePendingTransition(R.anim.slid_left, R.anim.slid_right);
+     	}
+     }
+     
+     public void onListItemClicked(View view){
+    	 if (isListModel) {
+    		 model_btn.setImageResource(R.drawable.listitem2);
+	    	 model_Layout.removeAllViews();
+	    	 model_Layout.addView(pictureModel);
+	    	 isListModel = false;
+		 }else {
+			 model_btn.setImageResource(R.drawable.picture_model);
+	    	 model_Layout.removeAllViews();
+	    	 model_Layout.addView(listModel);
+	    	 ListView listView = (ListView)listModel.findViewById(R.id.model_listview);
+	    	 listView.setAdapter(adapter);  // 设置 list model  数据
+	    	 isListModel = true;
+		 }
+     }
+     
+     // 返回键 返回到主界面
+  	@Override
+  	public boolean onKeyDown(int keyCode, KeyEvent event) {
+  		if (keyCode == KeyEvent.KEYCODE_BACK) {
+  			onBackMainClicked(null);
+  		}
+  		return super.onKeyDown(keyCode, event);
+  	}
+  	
+  	public void playMp3Oncliked(View view){
+  		try {
+			player.start();
+			seekBar.setMax(player.getDuration()); //设置总长度
+			handler.post(updateThread);
+		} catch (IllegalStateException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+  		if (player.isPalystatus()) {
+			playImg.setImageResource(R.drawable.play2);
+		}else {
+			playImg.setImageResource(R.drawable.pause2);
+		}
+  	}
+  	
+  	public void playPreOncliked(View view){
+
+  	}
+  	
+  	public void playNextOncliked(){
+  		player.next();
+  		seekBar.setMax(player.getDuration()); //设置总长度
+  		handler.post(updateThread);
+  		mp3_index++;
+  		player.next();
+  		if (mp3_index<mp3List.size()) {
+  			Log.i("mp3_index", ""+mp3_index);
+  			handler.sendEmptyMessage(0);
+		}
+  	}
+
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+			case R.id.play_next:
+				playNextOncliked();
+				break;
+	
+			default:
+				break;
+		}
+	}
+	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		player.pause();
+	}
+	
+	@Override
+	protected void onStop() {
+		super.onStop();
+	}
+	
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		if (player!=null) {
+			player = null;
+		}
+		//取消线程  
+        handler.removeCallbacks(updateThread);
+	}
+}

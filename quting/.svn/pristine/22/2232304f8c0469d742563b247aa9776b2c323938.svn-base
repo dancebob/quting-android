@@ -1,0 +1,98 @@
+package com.example.quting;
+
+import java.util.List;
+
+import com.example.quting.database.SqlLiteUtil;
+import com.example.quting.entity.media.MediaBaseEntity;
+import com.example.quting.resource.MediaInfo;
+import com.example.quting.utils.BitmapTool;
+
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.Context;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.View.OnClickListener;
+import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.AdapterView.OnItemClickListener;
+
+// 适配器中的每一项
+@SuppressLint("ValidFragment")
+public class ShopCategoryFragment extends Fragment{
+
+    private String text;
+	private GridView gridView;
+	private ShopAdapter adapter;
+	
+	private Context context;
+	
+	private List<MediaBaseEntity> mediaList;
+	private MediaBaseEntity mediaBaseEntity;
+	
+    public ShopCategoryFragment(Context context,ShopAdapter adapter){
+        super();
+        this.context = context;
+        this.adapter = adapter;
+        
+		mediaList = MediaInfo.getInstance().swichMediaBaseEntity(adapter.getFlag());
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.shop_view_category, container, false);
+        gridView = (GridView)v.findViewById(R.id.gridview);
+        gridView.setAdapter(adapter);
+		gridView.setOnItemClickListener(new OnItemClickListener() {  
+			@Override
+			public void onItemClick(AdapterView parent, View view, int position, long id) {
+				mediaBaseEntity = mediaList.get(position);  // 获取实体类
+				//Log.i("mediaBaseEntitymediaBaseEntity", ""+mediaBaseEntity.getName());
+				showItemDialog(mediaBaseEntity.getMtype(),mediaBaseEntity.getName(),mediaBaseEntity.getDescription());
+			}  
+		});
+        return v;
+    }
+    
+    public void showItemDialog(String imgUrl,String titleStr,String inStr){
+    	AlertDialog dlg = new AlertDialog.Builder(context).create();
+    	dlg.show();
+    	Window window = dlg.getWindow();
+    	window.setContentView(R.layout.shop_item_dialog);
+    	ImageView order = (ImageView) window.findViewById(R.id.img_order);
+    	OnClickListener listener = new OnClickListener(){
+			public void onClick(View view){  // 添加订阅功能
+	        	 switch(view.getId()){
+		        	 case R.id.img_order:
+		        		 mediaBaseEntity.setDingyue(1);
+		        		 SqlLiteUtil.insertMediaBaseEntity(mediaBaseEntity);
+		             break;				        	 
+	        	 }
+	         }
+		};
+		order.setOnClickListener(listener);
+		ImageView circleImageView = (ImageView)window.findViewById(R.id.img_circle);
+		circleImageView.setImageBitmap(BitmapTool.getNetBitmap(imgUrl));
+		
+		TextView tite = (TextView)window.findViewById(R.id.title);
+		tite.setText(titleStr);
+		
+		TextView info = (TextView)window.findViewById(R.id.info);
+		info.setText(inStr);
+		info.setMovementMethod(ScrollingMovementMethod.getInstance());  //设置一个滚动实例
+    }    
+    
+// 	public void onShopPlayStateClicked(View view){
+// 		Log.i("onPlayStateClicked", "dddd");
+// 	}
+}

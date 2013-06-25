@@ -1,0 +1,170 @@
+package com.example.quting;
+import com.example.quting.database.SqlLiteUtil;
+
+import android.os.Bundle;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.AlertDialog.Builder;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Color;
+import android.util.Log;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.Window;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.Toast;
+
+public class MainActivity extends Activity{
+	
+	private GridView gridView;
+	private GridAdapter adapter;
+	
+	private ListView listView;
+	private ConfigAdapter configadapter;
+	
+	private SlidingLayout slidingLayout;
+	
+	private QuTingApplication application; //程序全局类
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		
+		setContentView(R.layout.activity_main);
+		
+		SqlLiteUtil.getMainSQLiteDatabase(this);
+		
+		application = (QuTingApplication)getApplication();
+		application.addActivity(this);
+		
+		slidingLayout = (SlidingLayout)findViewById(R.id.slidingLayout);
+		gridView = (GridView)findViewById(R.id.gridview);
+		adapter = new GridAdapter(getApplicationContext());
+		gridView.setAdapter(adapter);
+		gridView.setOnItemClickListener(new OnItemClickListener() {  // 测试测试测试测试
+			@Override
+			public void onItemClick(AdapterView parent, View view, int position, long id) {
+				if (position == 0) {
+					goToMyFavActivity();
+				}else if (position == 1) {
+					goToPlayActivity();
+				}
+			}  
+		});
+		
+		listView = (ListView)findViewById(R.id.config_listview);
+//	    要想让ListView显示底部的分割线，需要同事满足以下的选项: 
+//		1）mFooterDividersEnabled 必须为true，其默认值是true的 
+//		2)ListView的高度必须为FILL_PARENT。
+		configadapter = new ConfigAdapter(getApplicationContext());
+		listView.setAdapter(configadapter);
+		//slidingLayout.setScrollEvent(gridView);
+	}
+	
+	// 播放状态按钮点击事件
+	public void onPlayStateClicked(View view){
+		Log.i("onPlayStateClicked", "play");
+	}
+	
+	public void onConfigClicked(View view){
+		// 实现点击一下menu展示左侧布局，再点击一下隐藏左侧布局的功能
+		if (slidingLayout.isLeftLayoutVisible()) {
+			slidingLayout.scrollToRightLayout();
+		} else {
+			slidingLayout.scrollToLeftLayout();
+		}
+	}
+	
+	public void onSearchClicked(View view){
+		Intent intent = new Intent(this,SearchActivity.class);
+		int version = Integer.valueOf(android.os.Build.VERSION.SDK);   
+		startActivity(intent);
+    	if(version >= 5) {   
+    	     overridePendingTransition(R.anim.slid_up, R.anim.slid_down);
+    	}
+	}
+	
+	public void goToMyFavActivity(){
+		Intent intent = new Intent(this,MyFavActivity.class);
+		int version = Integer.valueOf(android.os.Build.VERSION.SDK);   
+		startActivity(intent);
+    	if(version >= 5) {   
+    	     overridePendingTransition(R.anim.slid_left, R.anim.slid_right);
+    	}
+	}
+	
+	public void goToPlayActivity(){
+		Intent intent = new Intent(this,PlayActivity.class);
+//		int version = Integer.valueOf(android.os.Build.VERSION.SDK);   
+		startActivity(intent);
+//    	if(version >= 5) {   
+//    	     overridePendingTransition(R.anim.slid_left, R.anim.slid_right);
+//    	}
+	}
+	
+	public void goToShopClicked(View view){
+		Intent intent = new Intent(this,ShopViewPagerActivity.class);
+		int version = Integer.valueOf(android.os.Build.VERSION.SDK);   
+		startActivity(intent);
+    	if(version >= 5) {   
+    	     overridePendingTransition(R.anim.slid_left, R.anim.slid_right);
+    	}
+	}
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			showExitDialog();
+		}
+		return super.onKeyDown(keyCode, event);
+	}
+	
+	//显示退出对话框
+    private void showExitDialog() {
+    	Dialog exit_dialog = buildDialog(MainActivity.this,R.style.MyDialog);
+    	exit_dialog.setCanceledOnTouchOutside(true);//设置点击Dialog外部任意区域关闭Dialog
+    	exit_dialog.show();
+    }
+    
+    Dialog buildDialog(Context context,int theme) {		
+		//将layout变为View
+		LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		View view = inflater.inflate(R.layout.exit_dialog_layout, null);
+		Button ok = (Button) view.findViewById(R.id.dialog_button_ok);
+		Button cancle = (Button) view.findViewById(R.id.dialog_button_cancel);				
+			final Dialog dialog = new Dialog(context,theme);
+			dialog.setContentView(view);
+			dialog.setCancelable(true);
+			OnClickListener listener5 = new OnClickListener(){
+				public void onClick(View view){
+		        	 switch(view.getId()){
+		        	 case R.id.dialog_button_ok:
+		        		 dialog.dismiss();
+						 application.exitApplication();
+		        		 break;
+		        	 case R.id.dialog_button_cancel:
+		        		 dialog.dismiss();
+		        		 break;				        	 
+		        	 }
+		         }
+			};
+			ok.setOnClickListener(listener5);
+			cancle.setOnClickListener(listener5);
+			return dialog;
+     }
+	
+}

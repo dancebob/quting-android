@@ -1,0 +1,89 @@
+package com.example.quting;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
+
+public class PlayActivity extends Activity {
+	
+	 private RelativeLayout model_Layout; // 模式容器
+	 private LayoutInflater mInflater;  
+	 private View pictureModel,listModel; // 两种模式
+	 
+	 private ImageView model_btn;   // 切换模式的按钮
+	 private ListModelAdapter adapter;
+	 
+	 private boolean isListModel = false;  // 判断当前模式
+	 
+	 private QuTingApplication application; //程序全局类
+	
+     protected void onCreate(Bundle savedInstanceState) {
+    	 super.onCreate(savedInstanceState);
+    	 
+    	 setContentView(R.layout.activity_play);
+    	 
+  		 application = (QuTingApplication)getApplication();
+  		 application.addActivity(this);
+    	 
+    	 model_Layout = (RelativeLayout)findViewById(R.id.show_model);
+    	 mInflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    	 pictureModel = mInflater.inflate(R.layout.play_picture_model, null);
+    	 listModel = mInflater.inflate(R.layout.play_list_model, null);
+    	 model_Layout.addView(pictureModel);
+    	 
+    	 model_btn = (ImageView)findViewById(R.id.list_model);
+    	 
+    	 adapter = new ListModelAdapter(getApplicationContext());
+     }
+     
+     OnSeekBarChangeListener seekBarChangeListener = new OnSeekBarChangeListener(){
+         public void onProgressChanged(SeekBar seekBar, int progress,boolean fromUser) {
+             //mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0);
+         }
+         public void onStartTrackingTouch(SeekBar seekBar) {}
+         public void onStopTrackingTouch(SeekBar seekBar) {}
+     };
+     
+     public void onBackMainClicked(View view){
+ 		Intent intent = new Intent(this,MainActivity.class);
+ 		int version = Integer.valueOf(android.os.Build.VERSION.SDK);   
+ 		startActivity(intent);
+     	if(version >= 5) {   
+     		overridePendingTransition(R.anim.slid_left, R.anim.slid_right);
+     	}
+     }
+     
+     public void onListItemClicked(View view){
+    	 if (isListModel) {
+    		 model_btn.setImageResource(R.drawable.listitem2);
+	    	 model_Layout.removeAllViews();
+	    	 model_Layout.addView(pictureModel);
+	    	 isListModel = false;
+		 }else {
+			 model_btn.setImageResource(R.drawable.picture_model);
+	    	 model_Layout.removeAllViews();
+	    	 model_Layout.addView(listModel);
+	    	 ListView listView = (ListView)listModel.findViewById(R.id.model_listview);
+	    	 listView.setAdapter(adapter);  // 设置 list model  数据
+	    	 isListModel = true;
+		 }
+     }
+     
+     // 返回键 返回到主界面
+  	@Override
+  	public boolean onKeyDown(int keyCode, KeyEvent event) {
+  		if (keyCode == KeyEvent.KEYCODE_BACK) {
+  			onBackMainClicked(null);
+  		}
+  		return super.onKeyDown(keyCode, event);
+  	}
+}
